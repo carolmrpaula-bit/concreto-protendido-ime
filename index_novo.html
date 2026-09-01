@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Folha de cálculo — Concreto Protendido (NBR 6118:2026)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --papel:#fbfaf7; --grade:#dfe4ea; --tinta:#16283d; --tinta-fraca:#5f7080;
+  --linha:#c9d2dc; --caneta:#b3261e; --confere:#0f6b3f; --realce:#eef3f8;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;font-family:"IBM Plex Sans",system-ui,sans-serif;color:var(--tinta);
+  background:var(--papel);
+  background-image:linear-gradient(var(--grade) 1px,transparent 1px),
+                   linear-gradient(90deg,var(--grade) 1px,transparent 1px);
+  background-size:24px 24px;line-height:1.55;
+}
+.folha{max-width:1180px;margin:0 auto;padding:0 20px 72px}
+
+header{border-bottom:2px solid var(--tinta);margin-bottom:24px;padding:34px 0 16px;
+  display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end;justify-content:space-between}
+h1{font-size:clamp(1.6rem,3.4vw,2.35rem);font-weight:600;letter-spacing:-.02em;margin:0;line-height:1.1}
+header p{margin:.4rem 0 0;color:var(--tinta-fraca);max-width:52ch;font-size:.95rem}
+.carimbo{border:1.5px solid var(--linha);background:#fff;font-family:"IBM Plex Mono",monospace;
+  font-size:.72rem;color:var(--tinta-fraca);padding:8px 12px;line-height:1.7;white-space:nowrap}
+.carimbo b{color:var(--tinta);font-weight:500}
+
+nav{display:flex;border-bottom:1px solid var(--linha);flex-wrap:wrap}
+nav button{font:inherit;font-size:.93rem;font-weight:500;background:none;border:0;
+  border-bottom:3px solid transparent;color:var(--tinta-fraca);padding:11px 18px 9px;cursor:pointer}
+nav button:hover{color:var(--tinta)}
+nav button[aria-selected="true"]{color:var(--tinta);border-bottom-color:var(--caneta)}
+nav button:focus-visible{outline:2px solid var(--tinta);outline-offset:-2px}
+.legenda{margin:14px 0 22px;color:var(--tinta-fraca);font-size:.88rem;max-width:80ch}
+.legenda b{color:var(--tinta);font-weight:500}
+
+.painel{display:grid;grid-template-columns:minmax(300px,380px) 1fr;gap:30px;align-items:start}
+@media(max-width:860px){.painel{grid-template-columns:1fr}}
+[hidden]{display:none !important}
+
+.dados{background:#fff;border:1px solid var(--linha);padding:20px 20px 24px}
+.dados h2{font-size:.95rem;font-weight:600;margin:0 0 4px}
+.dados .sub{color:var(--tinta-fraca);font-size:.83rem;margin:0 0 16px}
+.grupo{border-top:1px solid var(--linha);margin:18px 0 0;padding-top:14px}
+.grupo h3{font-size:.82rem;font-weight:600;margin:0 0 11px;color:var(--tinta-fraca)}
+.campo{margin-bottom:13px}
+.campo label{display:block;font-size:.83rem;margin-bottom:4px;color:var(--tinta-fraca)}
+.campo label b{color:var(--tinta);font-weight:500}
+input,select{font:inherit;font-size:.92rem;width:100%;padding:7px 9px;border:1px solid var(--linha);
+  background:#fff;color:var(--tinta);font-family:"IBM Plex Mono",monospace}
+select{font-family:"IBM Plex Sans",sans-serif}
+input:focus,select:focus{outline:2px solid var(--tinta);outline-offset:-1px;border-color:var(--tinta)}
+.dupla{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+details{margin-top:14px;border-top:1px solid var(--linha);padding-top:12px}
+summary{cursor:pointer;font-size:.85rem;color:var(--tinta-fraca)}
+summary:focus-visible{outline:2px solid var(--tinta)}
+details .campo{margin-top:12px}
+
+.resolucao{background:#fff;border:1px solid var(--linha);min-height:420px}
+.resolucao > h2{font-size:.95rem;font-weight:600;margin:0;padding:14px 22px;
+  border-bottom:1px solid var(--linha);display:flex;justify-content:space-between;
+  align-items:baseline;gap:12px}
+.resolucao > h2 span{font-weight:400;font-size:.82rem;color:var(--tinta-fraca)}
+.corpo{padding:8px 22px 24px}
+
+.passo{display:grid;grid-template-columns:26px 1fr;gap:14px;padding:14px 0;border-bottom:1px solid #eef1f4}
+.passo:last-child{border-bottom:0}
+.num{font-family:"IBM Plex Mono",monospace;font-size:.85rem;color:var(--caneta);padding-top:1px}
+.titulo{font-size:.9rem;font-weight:600;margin:0 0 3px}
+.formula{font-size:.82rem;color:var(--tinta-fraca);margin:0 0 7px}
+.conta{font-family:"IBM Plex Mono",monospace;font-size:.855rem;line-height:1.85;white-space:pre-wrap;margin:0}
+.saida{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:.95rem;
+  border-bottom:2px solid var(--tinta);display:inline-block;padding:1px 4px 2px;margin-top:5px}
+.aviso{color:var(--caneta);font-size:.83rem;margin:6px 0 0}
+.obs{color:var(--tinta-fraca);font-size:.83rem;margin:6px 0 0}
+.item{font-family:"IBM Plex Mono",monospace;font-size:.72rem;color:var(--tinta-fraca);
+  border:1px solid var(--linha);padding:0 5px;margin-left:6px;white-space:nowrap;vertical-align:1px}
+
+.verif{margin-top:20px;border-top:2px solid var(--tinta);padding-top:14px}
+.verif h3{font-size:.88rem;font-weight:600;margin:0 0 10px}
+.check{display:grid;grid-template-columns:20px 1fr auto;gap:12px;align-items:baseline;
+  padding:6px 0;font-size:.85rem}
+.check .marca{font-size:1.1rem;line-height:1;color:var(--confere)}
+.check.falha .marca{color:var(--caneta)}
+.check .conta{font-size:.82rem}
+.check .veredito{font-family:"IBM Plex Mono",monospace;font-size:.78rem;color:var(--confere)}
+.check.falha .veredito{color:var(--caneta)}
+
+table.iter,table.ref{border-collapse:collapse;font-size:.8rem;margin-top:6px;width:100%}
+table.iter{font-family:"IBM Plex Mono",monospace}
+table.iter th,table.iter td{border:1px solid var(--linha);padding:3px 9px;text-align:right}
+table.iter th{background:var(--realce);font-weight:500;text-align:center}
+table.iter tr.eq td{background:#e6f4ea;font-weight:600}
+table.ref{font-size:.85rem}
+table.ref th,table.ref td{border:1px solid var(--linha);padding:6px 10px;text-align:left;vertical-align:top}
+table.ref th{background:var(--tinta);color:#fff;font-weight:500}
+table.ref tr:nth-child(even) td{background:var(--realce)}
+table.ref td.mono{font-family:"IBM Plex Mono",monospace;font-size:.82rem}
+table.ref td.it{font-family:"IBM Plex Mono",monospace;font-size:.78rem;color:var(--tinta-fraca);white-space:nowrap}
+.refbox{background:#fff;border:1px solid var(--linha);padding:20px 24px 26px}
+.refbox h2{font-size:1.05rem;margin:0 0 4px}
+.refbox h3{font-size:.9rem;margin:22px 0 8px}
+.refbox p{font-size:.88rem;color:var(--tinta-fraca);margin:0 0 6px;max-width:80ch}
+
+footer{margin-top:34px;padding-top:16px;border-top:1px solid var(--linha);
+  font-size:.82rem;color:var(--tinta-fraca);max-width:76ch}
+</style>
+</head>
+<body>
+<div class="folha">
+
+<header>
+  <div>
+    <h1>Folha de cálculo — concreto protendido</h1>
+    <p>Preencha os dados e a resolução se escreve ao lado, na ordem em que a conta é feita à mão, com o item da norma ao lado de cada critério.</p>
+  </div>
+  <div class="carimbo">
+    IME · Fortificação e Construção<br>
+    Disciplina: <b>Concreto Protendido</b><br>
+    Referência: <b>ABNT NBR 6118:2026</b>
+  </div>
+</header>
+
+<nav role="tablist">
+  <button role="tab" id="tab-q2" aria-controls="q2" aria-selected="true">Pré-dimensionar à ruptura</button>
+  <button role="tab" id="tab-q4" aria-controls="q4" aria-selected="false">Verificar à ruptura</button>
+  <button role="tab" id="tab-q3" aria-controls="q3" aria-selected="false">Tensões em serviço</button>
+  <button role="tab" id="tab-q1" aria-controls="q1" aria-selected="false">Aço de protensão</button>
+  <button role="tab" id="tab-q5" aria-controls="q5" aria-selected="false">Referência NBR 2026</button>
+</nav>
+<p class="legenda" id="legenda"></p>
+
+<!-- ===================== Q2 ===================== -->
+<section class="painel" id="q2" role="tabpanel" aria-labelledby="tab-q2">
+  <form class="dados" oninput="calcQ2()" onsubmit="return false">
+    <h2>Dados da seção</h2>
+    <p class="sub">A armadura ainda não existe: você quer saber quantos cabos usar.</p>
+    <div class="campo"><label for="a2"><b>Aço de protensão</b></label>
+      <select id="a2"><option>CP-190 RB</option><option>CP-210 RB</option>
+      <option>CP-175 RB</option><option>CP-190 RN</option></select></div>
+    <div class="campo"><label for="sis2"><b>Sistema de protensão</b></label>
+      <select id="sis2">
+        <option value="pos">Pós-tração aderente — 0,74 f<sub>ptk</sub></option>
+        <option value="posna">Pós-tração não aderente — 0,80 f<sub>ptk</sub></option>
+        <option value="pre">Pré-tração — 0,77 f<sub>ptk</sub></option></select></div>
+    <div class="dupla">
+      <div class="campo"><label for="fck2"><b>f<sub>ck</sub></b> (MPa)</label>
+        <input id="fck2" type="number" step="any" value="40"></div>
+      <div class="campo"><label for="nc2"><b>Cordoalhas por cabo</b></label>
+        <input id="nc2" type="number" step="1" min="1" value="5"></div>
+    </div>
+    <div class="campo"><label for="cord2"><b>Cordoalha</b> (mm)</label>
+      <select id="cord2"><option value="0.548">9,5 — 0,548 cm²</option>
+      <option value="0.9867" selected>12,7 — 0,9867 cm²</option>
+      <option value="1.400">15,2 — 1,400 cm²</option></select></div>
+    <div class="dupla">
+      <div class="campo"><label for="mg2"><b>M<sub>g,k</sub></b> (kN·m)</label>
+        <input id="mg2" type="number" step="any" value="2000"></div>
+      <div class="campo"><label for="mq2"><b>M<sub>q,k</sub></b> (kN·m)</label>
+        <input id="mq2" type="number" step="any" value="2000"></div>
+    </div>
+    <div class="dupla">
+      <div class="campo"><label for="bf2"><b>b<sub>f</sub></b> — mesa (cm)</label>
+        <input id="bf2" type="number" step="any" value="250"></div>
+      <div class="campo"><label for="hl2"><b>h<sub>laje</sub></b> (cm)</label>
+        <input id="hl2" type="number" step="any" value="20"></div>
+    </div>
+    <div class="dupla">
+      <div class="campo"><label for="hv2"><b>H<sub>viga</sub></b> (cm)</label>
+        <input id="hv2" type="number" step="any" value="150"></div>
+      <div class="campo"><label for="cg2"><b>CG dos cabos</b> (cm)</label>
+        <input id="cg2" type="number" step="any" value="12"></div>
+    </div>
+    <div class="campo">
+      <label for="cam2"><b>Camadas de cabos</b> — nº × altura, separadas por vírgula</label>
+      <input id="cam2" type="text" value="4x8, 2x20"></div>
+    <details>
+      <summary>Coeficientes de ponderação</summary>
+      <p class="sub" style="margin:12px 0 4px">Tabela 11.1 da NBR 6118:2026 → γ<sub>g</sub> = γ<sub>q</sub> = 1,4. Troque para 1,35 / 1,5 se o professor pedir a ABNT NBR 8681.</p>
+      <div class="dupla">
+        <div class="campo"><label for="gg2">γ<sub>g</sub></label><input id="gg2" type="number" step="any" value="1.4"></div>
+        <div class="campo"><label for="gq2">γ<sub>q</sub></label><input id="gq2" type="number" step="any" value="1.4"></div>
+      </div>
+      <div class="dupla">
+        <div class="campo"><label for="gc2">γ<sub>c</sub></label><input id="gc2" type="number" step="any" value="1.4"></div>
+        <div class="campo"><label for="gs2">γ<sub>s</sub></label><input id="gs2" type="number" step="any" value="1.15"></div>
+      </div>
+    </details>
+  </form>
+  <div class="resolucao"><h2>Resolução <span>9 passos + conferência do CG</span></h2>
+    <div class="corpo" id="out2"></div></div>
+</section>
+
+<!-- ===================== Q4 ===================== -->
+<section class="painel" id="q4" role="tabpanel" aria-labelledby="tab-q4" hidden>
+  <form class="dados" oninput="calcQ4()" onsubmit="return false">
+    <h2>Dados da seção armada</h2>
+    <p class="sub">A armadura já existe: você quer saber se M<sub>u</sub> ≥ M<sub>d</sub>.</p>
+    <div class="grupo" style="border-top:0;margin-top:0;padding-top:0"><h3>Geometria (cm)</h3>
+      <div class="dupla">
+        <div class="campo"><label for="bf4"><b>b<sub>f</sub></b> — mesa superior</label>
+          <input id="bf4" type="number" step="any" value="100"></div>
+        <div class="campo"><label for="hf4"><b>h<sub>f</sub></b> — altura da mesa</label>
+          <input id="hf4" type="number" step="any" value="28"></div>
+      </div>
+      <div class="dupla">
+        <div class="campo"><label for="bw4"><b>b<sub>w</sub></b> — alma</label>
+          <input id="bw4" type="number" step="any" value="30"></div>
+        <div class="campo"><label for="h4"><b>Altura total</b></label>
+          <input id="h4" type="number" step="any" value="150"></div>
+      </div>
+      <div class="campo"><label for="cg4"><b>CG dos cabos</b> — da base</label>
+        <input id="cg4" type="number" step="any" value="12"></div>
+    </div>
+    <div class="grupo"><h3>Materiais</h3>
+      <div class="dupla">
+        <div class="campo"><label for="fck4"><b>f<sub>ck</sub></b> (MPa)</label>
+          <input id="fck4" type="number" step="any" value="40"></div>
+        <div class="campo"><label for="asp4"><b>A<sub>sp</sub></b> (cm²)</label>
+          <input id="asp4" type="number" step="any" value="56"></div>
+      </div>
+      <div class="campo"><label for="a4"><b>Aço</b></label>
+        <select id="a4" onchange="tabelaPadrao()"><option>CP-190 RB</option><option>CP-210 RB</option>
+        <option>CP-175 RB</option><option>CP-190 RN</option></select></div>
+      <div class="campo"><label for="epre4"><b>ε pré-alongamento + descompressão</b> (‰)</label>
+        <input id="epre4" type="number" step="any" value="5.6"></div>
+    </div>
+    <div class="grupo"><h3>Solicitações (kN·m)</h3>
+      <div class="dupla">
+        <div class="campo"><label for="mg4"><b>M<sub>g,k</sub></b></label>
+          <input id="mg4" type="number" step="any" value="5000"></div>
+        <div class="campo"><label for="mq14"><b>M<sub>q1,k</sub></b></label>
+          <input id="mq14" type="number" step="any" value="1800"></div>
+      </div>
+      <div class="dupla">
+        <div class="campo"><label for="mq24"><b>M<sub>q2,k</sub></b></label>
+          <input id="mq24" type="number" step="any" value="800"></div>
+        <div class="campo"><label for="psi04"><b>ψ<sub>0</sub></b> na 2ª acidental</label>
+          <input id="psi04" type="number" step="any" value="1"></div>
+      </div>
+    </div>
+    <details>
+      <summary>Diagrama σ×ε do aço e coeficientes</summary>
+      <p class="sub" style="margin:12px 0 4px">Abaixo de ε<sub>pyd</sub> o trecho é elástico (E<sub>p</sub> = 200 GPa, item 8.4.4). Acima, a página interpola entre estes dois pontos da Tabela 14 (Cholfe) — confira na sua tabela.</p>
+      <div class="dupla">
+        <div class="campo"><label for="s10">σ<sub>p</sub> a 10 ‰ (MPa)</label><input id="s10" type="number" step="any" value="1499"></div>
+        <div class="campo"><label for="s15">σ<sub>p</sub> a 15 ‰ (MPa)</label><input id="s15" type="number" step="any" value="1525"></div>
+      </div>
+      <div class="dupla">
+        <div class="campo"><label for="gg4">γ<sub>g</sub></label><input id="gg4" type="number" step="any" value="1.4"></div>
+        <div class="campo"><label for="gq4">γ<sub>q</sub></label><input id="gq4" type="number" step="any" value="1.4"></div>
+      </div>
+      <div class="dupla">
+        <div class="campo"><label for="gc4">γ<sub>c</sub></label><input id="gc4" type="number" step="any" value="1.4"></div>
+        <div class="campo"><label for="gs4">γ<sub>s</sub></label><input id="gs4" type="number" step="any" value="1.15"></div>
+      </div>
+    </details>
+  </form>
+  <div class="resolucao"><h2>Resolução <span>iteração até R<sub>cc</sub> = R<sub>st</sub></span></h2>
+    <div class="corpo" id="out4"></div></div>
+</section>
+
+<!-- ===================== Q3 ===================== -->
+<section class="painel" id="q3" role="tabpanel" aria-labelledby="tab-q3" hidden>
+  <form class="dados" oninput="calcQ3()" onsubmit="return false">
+    <h2>Dados da viga</h2>
+    <p class="sub">Biapoiada, seção do meio do vão. Compressão positiva.</p>
+    <div class="campo"><label for="modo3"><b>O que você quer</b></label>
+      <select id="modo3" onchange="modo3()">
+        <option value="min">Achar a força de protensão mínima</option>
+        <option value="ver">Verificar os limites com N conhecido</option>
+      </select></div>
+    <div class="dupla">
+      <div class="campo"><label for="fck3"><b>f<sub>ck</sub></b> (MPa)</label>
+        <input id="fck3" type="number" step="any" value="30"></div>
+      <div class="campo"><label for="L3"><b>Vão L</b> (m)</label>
+        <input id="L3" type="number" step="any" value="20"></div>
+    </div>
+    <div class="dupla">
+      <div class="campo"><label for="g3"><b>Permanente g</b> (kN/m)</label>
+        <input id="g3" type="number" step="any" value="12"></div>
+      <div class="campo"><label for="q3v"><b>Acidental q</b> (kN/m)</label>
+        <input id="q3v" type="number" step="any" value="20"></div>
+    </div>
+    <div class="campo"><label for="A3"><b>Área A</b> (m²)</label>
+      <input id="A3" type="number" step="any" value="0.401"></div>
+    <div class="dupla">
+      <div class="campo"><label for="Ws3"><b>W<sub>s</sub></b> (m³)</label>
+        <input id="Ws3" type="number" step="any" value="0.1325"></div>
+      <div class="campo"><label for="Wi3"><b>W<sub>i</sub></b> (m³)</label>
+        <input id="Wi3" type="number" step="any" value="0.0993"></div>
+    </div>
+    <div class="dupla">
+      <div class="campo"><label for="yc3"><b>Centroide</b> — da base (m)</label>
+        <input id="yc3" type="number" step="any" value="0.63"></div>
+      <div class="campo"><label for="yp3"><b>Cabo</b> — da base (m)</label>
+        <input id="yp3" type="number" step="any" value="0.11"></div>
+    </div>
+    <div class="dupla">
+      <div class="campo"><label for="pd3"><b>Perdas diferidas</b> (%)</label>
+        <input id="pd3" type="number" step="any" value="15"></div>
+      <div class="campo"><label for="gp3"><b>γ<sub>p</sub></b> no ato</label>
+        <input id="gp3" type="number" step="any" value="1.1"></div>
+    </div>
+    <div class="grupo"><h3>Combinações e forma da seção</h3>
+      <div class="dupla">
+        <div class="campo"><label for="psi13"><b>ψ<sub>1</sub></b></label>
+          <input id="psi13" type="number" step="any" value="0.5"></div>
+        <div class="campo"><label for="psi23"><b>ψ<sub>2</sub></b></label>
+          <input id="psi23" type="number" step="any" value="0.3"></div>
+      </div>
+      <div class="campo"><label for="alpha3"><b>Forma da seção</b> — α em f<sub>ct,f</sub></label>
+        <select id="alpha3"><option value="1.2">Seção T ou duplo T — α = 1,2</option>
+        <option value="1.3">Seção I ou T invertido — α = 1,3</option>
+        <option value="1.5">Retangular — α = 1,5</option></select></div>
+      <div class="campo"><label for="tipo3"><b>Nível de protensão</b></label>
+        <select id="tipo3"><option value="completa">Completa (Nível 3) — ELS-F na rara</option>
+        <option value="limitada">Limitada (Nível 2) — ELS-F na frequente</option></select></div>
+    </div>
+    <div id="bloco-min">
+      <div class="grupo"><h3>Condição a impor</h3>
+        <div class="campo"><label for="comb3"><b>Combinação usada na condição</b></label>
+          <select id="comb3"><option value="rara">Rara — g + q (o que o enunciado costuma pedir)</option>
+          <option value="freq">Frequente — g + ψ<sub>1</sub>q (ELS-D da protensão completa)</option>
+          <option value="qp">Quase permanente — g + ψ<sub>2</sub>q</option></select></div>
+        <div class="campo"><label for="ta3"><b>Tração admitida na fibra inferior</b> (MPa)</label>
+          <input id="ta3" type="number" step="any" value="0"></div>
+        <p class="sub" id="dica3" style="margin:10px 0 0"></p>
+      </div>
+    </div>
+    <div id="bloco-ver" hidden>
+      <div class="grupo"><h3>Protensão</h3>
+        <div class="campo"><label for="N3"><b>N no ato da protensão</b> (kN)</label>
+          <input id="N3" type="number" step="any" value="1750"></div>
+        <div class="campo"><label for="fckj3"><b>f<sub>ckj</sub></b> no ato (MPa) — em branco usa f<sub>ck</sub></label>
+          <input id="fckj3" type="number" step="any" value=""></div>
+      </div>
+    </div>
+  </form>
+  <div class="resolucao"><h2>Resolução <span id="sub3"></span></h2>
+    <div class="corpo" id="out3"></div></div>
+</section>
+
+<!-- ===================== Q1 ===================== -->
+<section class="painel" id="q1" role="tabpanel" aria-labelledby="tab-q1" hidden>
+  <form class="dados" oninput="calcQ1()" onsubmit="return false">
+    <h2>Aço de protensão</h2>
+    <p class="sub">Deformação de escoamento e tensão inicial admissível no cabo.</p>
+    <div class="campo"><label for="a1"><b>Aço</b></label>
+      <select id="a1"><option>CP-190 RB</option><option selected>CP-210 RB</option>
+      <option>CP-175 RB</option><option>CP-190 RN</option></select></div>
+    <div class="campo"><label for="sis1"><b>Sistema de protensão</b></label>
+      <select id="sis1">
+        <option value="pos">Pós-tração aderente — 0,74 f<sub>ptk</sub></option>
+        <option value="posna">Pós-tração não aderente — 0,80 f<sub>ptk</sub></option>
+        <option value="pre">Pré-tração — 0,77 f<sub>ptk</sub></option></select></div>
+    <div class="dupla">
+      <div class="campo"><label for="Ep1"><b>E<sub>p</sub></b> (MPa)</label>
+        <input id="Ep1" type="number" step="any" value="200000"></div>
+      <div class="campo"><label for="gs1"><b>γ<sub>s</sub></b></label>
+        <input id="gs1" type="number" step="any" value="1.15"></div>
+    </div>
+    <p class="sub" style="margin-top:14px">O item 8.4.4 adota E<sub>p</sub> = 200 GPa na falta de dados do fabricante. Não confunda ε<sub>pyd</sub> com os 10 ‰ da Figura 17.1, que são o alongamento máximo do aço.</p>
+  </form>
+  <div class="resolucao"><h2>Resolução <span>escoamento e σ<sub>p0</sub></span></h2>
+    <div class="corpo" id="out1"></div></div>
+</section>
+
+<!-- ===================== Q5 — referência ===================== -->
+<section id="q5" role="tabpanel" aria-labelledby="tab-q5" hidden>
+  <div class="refbox">
+    <h2>Referência rápida — ABNT NBR 6118:2026</h2>
+    <p>Quinta edição, 11.03.2026. Os itens entre colchetes são os da norma, para citar na folha de prova.</p>
+
+    <h3>O que mudou em relação à edição anterior</h3>
+    <table class="ref">
+      <tr><th>Item</th><th>Antes</th><th>Agora</th></tr>
+      <tr><td>Tensão inicial no cabo <span class="it">9.6.1.2.1</span></td>
+          <td class="mono">mín(0,74 f<sub>ptk</sub> ; 0,82 f<sub>pyk</sub>)</td>
+          <td class="mono">0,74 f<sub>ptk</sub> pós aderente<br>0,80 f<sub>ptk</sub> pós não aderente<br>0,77 f<sub>ptk</sub> pré-tração</td></tr>
+      <tr><td>Ponderação das ações <span class="it">Tabela 11.1</span></td>
+          <td class="mono">provas usaram 1,35 / 1,50</td>
+          <td class="mono">γ<sub>g</sub> = 1,4 e γ<sub>q</sub> = 1,4<br>(1,3 no peso próprio pré-moldado)</td></tr>
+      <tr><td>Tração no ELS-F <span class="it">17.2.4.4.2</span></td>
+          <td class="mono">α · f<sub>ctm</sub></td>
+          <td class="mono"><b>0,7 · α · f<sub>ctm</sub></b></td></tr>
+      <tr><td>Compressão em serviço <span class="it">17.2.4.4.1</span></td>
+          <td class="mono">0,5 f<sub>ck</sub> como regra única</td>
+          <td class="mono">0,45 f<sub>ck</sub> quase permanente<br>0,6 f<sub>ck</sub> frequente e rara</td></tr>
+      <tr><td>Tensão de pico no ELU <span class="it">17.2.2-e</span></td>
+          <td class="mono">0,85 f<sub>cd</sub></td>
+          <td class="mono">α<sub>c</sub> η<sub>c</sub> f<sub>cd</sub><br>η<sub>c</sub> = 1,0 até C40</td></tr>
+      <tr><td>ELU no ato <span class="it">17.2.4.3.1</span></td>
+          <td class="mono">γ<sub>p</sub> = 1,1</td>
+          <td class="mono">γ<sub>p</sub> = 1,1 (pós) ou 1,0 (pré)<br>γ<sub>f</sub> = 1,0 desfav. e <b>0,9 favor.</b></td></tr>
+    </table>
+
+    <h3>Constantes e limites</h3>
+    <table class="ref">
+      <tr><th>Grandeza</th><th>Expressão</th><th>Item</th></tr>
+      <tr><td>Módulo do aço de protensão</td><td class="mono">E<sub>p</sub> = 200 GPa</td><td class="it">8.4.4</td></tr>
+      <tr><td>Resistência à tração média</td><td class="mono">f<sub>ct,m</sub> = 0,3 f<sub>ck</sub><sup>2/3</sup> (até C50)</td><td class="it">8.2.5</td></tr>
+      <tr><td>Quantil inferior</td><td class="mono">f<sub>ctk,inf</sub> = 0,7 f<sub>ct,m</sub></td><td class="it">8.2.5</td></tr>
+      <tr><td>Fator de forma α</td><td class="mono">1,2 (T e duplo T) · 1,3 (I e T invertido) · 1,5 (retangular)</td><td class="it">17.3.1</td></tr>
+      <tr><td>Retângulo de tensões</td><td class="mono">y = λx ; λ = 0,8 até C50 ; 0,8 − (f<sub>ck</sub>−50)/400 acima</td><td class="it">17.2.2-e</td></tr>
+      <tr><td>Pico de compressão</td><td class="mono">α<sub>c</sub> = 0,85 até C50 ; 0,85[1 − (f<sub>ck</sub>−50)/200] acima<br>η<sub>c</sub> = 1,0 até C40 ; (40/f<sub>ck</sub>)<sup>1/3</sup> acima<br>usar 0,9 α<sub>c</sub> η<sub>c</sub> f<sub>cd</sub> se a largura diminuir para a borda comprimida</td><td class="it">17.2.2-e<br>8.2.10.1</td></tr>
+      <tr><td>Deformações do concreto</td><td class="mono">ε<sub>c2</sub> = 2,0 ‰ e ε<sub>cu</sub> = 3,5 ‰ até C50</td><td class="it">8.2.10.1</td></tr>
+      <tr><td>Alongamento máximo do aço</td><td class="mono">10 ‰</td><td class="it">Figura 17.1</td></tr>
+      <tr><td>Dutilidade</td><td class="mono">x/d ≤ 0,45 até C50 ; ≤ 0,35 acima</td><td class="it">14.6.4.3</td></tr>
+      <tr><td>Coeficientes dos materiais</td><td class="mono">γ<sub>c</sub> = 1,4 e γ<sub>s</sub> = 1,15 (normais) ; 1,2 e 1,15 (construção)</td><td class="it">Tabela 12.1</td></tr>
+      <tr><td>Limites no ato, estádio I</td><td class="mono">compressão ≤ 0,7 f<sub>ckj</sub> · tração ≤ 1,2 f<sub>ctm</sub></td><td class="it">17.2.4.3.2</td></tr>
+      <tr><td>ELS-D</td><td class="mono">tensão-limite de tração nula</td><td class="it">17.2.4.4.2</td></tr>
+      <tr><td>ψ<sub>1</sub> de ponte rodoviária</td><td class="mono">0,5 vigas · 0,7 transversinas · 0,8 lajes de tabuleiro</td><td class="it">23.5.2</td></tr>
+    </table>
+
+    <h3>Qual combinação usar em cada ELS <span class="it">Tabela 13.4</span></h3>
+    <table class="ref">
+      <tr><th>Nível de protensão</th><th>ELS-F</th><th>ELS-D</th></tr>
+      <tr><td>Nível 3 — completa</td><td class="mono">combinação rara</td><td class="mono">combinação frequente</td></tr>
+      <tr><td>Nível 2 — limitada</td><td class="mono">combinação frequente</td><td class="mono">combinação quase permanente</td></tr>
+      <tr><td>Nível 1 — parcial</td><td class="mono">ELS-W com w<sub>k</sub> ≤ 0,2 mm, combinação frequente</td><td class="mono">—</td></tr>
+    </table>
+    <p style="margin-top:8px">Combinação rara: Σ F<sub>gik</sub> + F<sub>q1k</sub> + Σ ψ<sub>1j</sub>F<sub>qjk</sub> · frequente: Σ F<sub>gik</sub> + ψ<sub>1</sub>F<sub>q1k</sub> + Σ ψ<sub>2j</sub>F<sub>qjk</sub> · quase permanente: Σ F<sub>gik</sub> + Σ ψ<sub>2j</sub>F<sub>qjk</sub> <span class="it">Tabela 11.4</span></p>
+    <p>Em lajes protendidas, basta atender ao ELS-F na combinação frequente, em qualquer classe de agressividade <span class="it">Tabela 13.4, Nota 2</span>.</p>
+  </div>
+</section>
+
+<footer>
+  Critérios conforme a ABNT NBR 6118:2026. As perdas de protensão entram como fração informada, não são calculadas. Na verificação à ruptura, σ<sub>p</sub> vem dos dois pontos que você informou no diagrama do aço — confira contra a tabela oficial. Confira sempre contra a resolução manual.
+</footer>
+</div>
+
+<script>
+/* ---------------- materiais e critérios da NBR 6118:2026 ---------------- */
+const ACOS = {
+  "CP-190 RB":{fptk:1900,rel:"RB"}, "CP-210 RB":{fptk:2100,rel:"RB"},
+  "CP-175 RB":{fptk:1750,rel:"RB"}, "CP-190 RN":{fptk:1900,rel:"RN"}
+};
+const E_P = 200000;
+const fpyk = a => (ACOS[a].rel==="RB" ? 0.90 : 0.85) * ACOS[a].fptk;
+
+/* 9.6.1.2.1 — um único limite, sempre sobre fptk */
+const SIST = {
+  pos:  {c:0.74, nome:"pós-tração aderente",     item:"9.6.1.2.1-b"},
+  posna:{c:0.80, nome:"pós-tração não aderente", item:"9.6.1.2.1-c"},
+  pre:  {c:0.77, nome:"pré-tração",              item:"9.6.1.2.1-a"}
+};
+const sigmaP0 = (a,sis) => ({valor: SIST[sis].c*ACOS[a].fptk, ...SIST[sis], fpt:ACOS[a].fptk});
+
+/* 8.2.10.1 e 17.2.2-e */
+function conc(fck){
+  return {
+    lam:  fck<=50 ? 0.8  : 0.8 - (fck-50)/400,
+    ac:   fck<=50 ? 0.85 : 0.85*(1-(fck-50)/200),
+    ec:   fck<=40 ? 1.0  : Math.pow(40/fck,1/3),
+    ecu:  fck<=50 ? 3.5  : 2.6 + 35*Math.pow((90-fck)/100,4),
+    fctm: fck<=50 ? 0.3*Math.pow(fck,2/3) : 2.12*Math.log(1+0.11*fck),
+    xd:   fck<=50 ? 0.45 : 0.35
+  };
+}
+
+const $ = id => document.getElementById(id);
+const n = id => parseFloat($(id).value);
+const f = (x,d=2) => Number.isFinite(x)
+  ? x.toLocaleString("pt-BR",{minimumFractionDigits:d,maximumFractionDigits:d}).replace("-","\u2212")
+  : "\u2014";
+const IT = t => `<span class="item">${t}</span>`;
+
+function passo(num, titulo, formula, conta, saida, aviso, obs){
+  return `<div class="passo"><div class="num">${num}</div><div>
+    <p class="titulo">${titulo}</p>
+    ${formula?`<p class="formula">${formula}</p>`:""}
+    ${conta?`<p class="conta">${conta}</p>`:""}
+    ${saida?`<div class="saida">${saida}</div>`:""}
+    ${aviso?`<p class="aviso">${aviso}</p>`:""}
+    ${obs?`<p class="obs">${obs}</p>`:""}
+  </div></div>`;
+}
+function check(ok, texto, conta, veredito){
+  return `<div class="check${ok?"":" falha"}"><span class="marca">${ok?"✓":"✗"}</span>
+    <span>${texto}<br><span class="conta">${conta}</span></span>
+    <span class="veredito">${veredito}</span></div>`;
+}
+function vazio(id,msg){ $(id).innerHTML = `<p class="aviso" style="margin:26px 0">${msg}</p>`; }
+
+/* ---------------- Q2 — pré-dimensionamento ---------------- */
+function calcQ2(){
+  const aco=$("a2").value, sis=$("sis2").value;
+  const fck=n("fck2"), Acord=parseFloat($("cord2").value), nc=n("nc2");
+  const Mgk=n("mg2"), Mqk=n("mq2"), bf=n("bf2"), hl=n("hl2"), hv=n("hv2"), cg=n("cg2");
+  const gg=n("gg2"), gq=n("gq2"), gc=n("gc2"), gs=n("gs2");
+  if([fck,Acord,nc,Mgk,Mqk,bf,hl,hv,cg,gg,gq,gc,gs].some(v=>!Number.isFinite(v)))
+    return vazio("out2","Preencha todos os campos numéricos para ver a resolução.");
+
+  const C=conc(fck), sp=sigmaP0(aco,sis), sp0=sp.valor/10, fpy=fpyk(aco)/10;
+  const Acabo=nc*Acord, Np0=sp0*Acabo, Md=gg*Mgk+gq*Mqk, z=hv+hl/2-cg;
+  const fcd=fck/gc/10, sc=C.ac*C.ec*fcd, RccAdm=sc*bf*hl, Rst=Md/(z/100);
+  const N1=fpy*Acabo/gs, nex=Rst/N1, ncabos=Math.ceil(nex), naMesa=Rst<=RccAdm;
+
+  let h="";
+  h+=passo(1,`Tensão inicial no cabo — ${sp.nome}`+IT(sp.item),
+    "σ<sub>p0</sub> = c · f<sub>ptk</sub>, com c = 0,74 (pós aderente), 0,80 (pós não aderente) ou 0,77 (pré)",
+    `${aco} → f_ptk = ${f(sp.fpt/10,1)} kN/cm²\nσ_p0 = ${f(sp.c,2)} × ${f(sp.fpt/10,1)}`,
+    `σ_p0 = ${f(sp0)} kN/cm²`, null,
+    `A NBR 6118:2026 não traz mais o limite por f_pyk — o único critério é este.`);
+  h+=passo(2,"Área de um cabo","A<sub>cabo</sub> = n<sub>cord</sub> · A<sub>cord</sub>",
+    `A_cabo = ${nc} × ${f(Acord,4)} cm²`, `A_cabo = ${f(Acabo)} cm²`);
+  h+=passo(3,"Força inicial em um cabo","N<sub>p0</sub> = σ<sub>p0</sub> · A<sub>cabo</sub>",
+    `N_p0 = ${f(sp0)} × ${f(Acabo)}`, `N_p0 = ${f(Np0,1)} kN`);
+  h+=passo(4,"Momento último"+IT("Tabela 11.1"),
+    "M<sub>d</sub> = γ<sub>g</sub>·M<sub>g,k</sub> + γ<sub>q</sub>·M<sub>q,k</sub>",
+    `M_d = ${f(gg,2)} × ${f(Mgk,0)} + ${f(gq,2)} × ${f(Mqk,0)}`, `M_d = ${f(Md,0)} kN·m`, null,
+    (gg===1.4&&gq===1.4)?`γ_g = γ_q = 1,4 é o valor da Tabela 11.1 para combinações normais.`
+      :`Você está usando γ_g = ${f(gg,2)} e γ_q = ${f(gq,2)}; a Tabela 11.1 da NBR 6118:2026 dá 1,4 e 1,4.`);
+  h+=passo(5,"Braço de alavanca","z = H<sub>viga</sub> + h<sub>laje</sub>/2 − CG<sub>cabos</sub>",
+    `z = ${f(hv,0)} + ${f(hl,0)}/2 − ${f(cg,0)}`, `z = ${f(z,1)} cm = ${f(z/100,3)} m`);
+  h+=passo(6,"Compressão admissível na mesa"+IT("17.2.2-e"),
+    "R<sub>cc,adm</sub> = α<sub>c</sub> η<sub>c</sub> f<sub>cd</sub> · b<sub>f</sub> · h<sub>laje</sub>",
+    `f_cd = ${f(fck,0)} / ${f(gc,2)} = ${f(fcd,3)} kN/cm²\n`+
+    `α_c = ${f(C.ac,3)}   η_c = ${f(C.ec,3)}   →  σ_c = ${f(sc,4)} kN/cm²\n`+
+    `R_cc,adm = ${f(sc,4)} × ${f(bf,0)} × ${f(hl,0)}`, `R_cc,adm = ${f(RccAdm,0)} kN`, null,
+    fck<=40?`η_c = 1,0 porque f_ck ≤ 40 MPa.`:`η_c = (40/f_ck)^(1/3) = ${f(C.ec,3)} porque f_ck > 40 MPa.`);
+  h+=passo(7,"Resultantes de projeto","R<sub>cc</sub> = R<sub>st</sub> = M<sub>d</sub> / z",
+    `R_st = ${f(Md,0)} / ${f(z/100,3)}`, `R_st = ${f(Rst,1)} kN`,
+    naMesa?null:`R_st &gt; R_cc,adm — a linha neutra sai da mesa. Este resultado não vale: refaça como seção T real.`,
+    naMesa?`R_st ≤ R_cc,adm — a linha neutra cai na mesa, o cálculo como seção retangular de largura b_f é válido.`:null);
+  h+=passo(8,"Resistência de um cabo no ELU"+IT("Tabela 12.1"),
+    "N<sub>1cabo</sub> = f<sub>pyk</sub> · A<sub>cabo</sub> / γ<sub>s</sub>",
+    `N_1cabo = ${f(fpy,1)} × ${f(Acabo)} / ${f(gs,2)}`, `N_1cabo = ${f(N1,1)} kN`);
+  h+=passo(9,"Número de cabos","n = R<sub>st</sub> / N<sub>1cabo</sub>, arredondado para cima",
+    `n = ${f(Rst,1)} / ${f(N1,1)} = ${f(nex)}`,
+    `adotar ${ncabos} cabos — A_p = ${f(ncabos*Acabo,1)} cm², N_p0 total = ${f(ncabos*Np0,0)} kN`);
+
+  const camadas=($("cam2").value.match(/(\d+(?:[.,]\d+)?)\s*[x×]\s*(\d+(?:[.,]\d+)?)/g)||[])
+    .map(s=>s.split(/[x×]/).map(v=>parseFloat(v.replace(",","."))));
+  if(camadas.length){
+    const tot=camadas.reduce((s,[q])=>s+q,0);
+    const cgr=camadas.reduce((s,[q,alt])=>s+q*alt,0)/tot;
+    const bate=Math.abs(cgr-cg)<0.5, zn=hv+hl/2-cgr;
+    h+=passo(10,"Conferência do CG real","CG = Σ(n<sub>i</sub>·h<sub>i</sub>) / Σn<sub>i</sub>",
+      `CG = (${camadas.map(([q,alt])=>`${f(q,0)} × ${f(alt,0)}`).join(" + ")}) / ${f(tot,0)}`,
+      `CG real = ${f(cgr)} cm  (adotado: ${f(cg,0)} cm)`,
+      tot!==ncabos?`As camadas somam ${f(tot,0)} cabos, mas o passo 9 pediu ${ncabos}. Redistribua os cabos.`
+        : bate?null:`Diferente do adotado: refaça o passo 5 com z = ${f(zn,1)} cm e repita a partir dali.`,
+      (tot===ncabos&&bate)?`Confere com o valor adotado no passo 5 — não precisa iterar.`:null);
+  }
+  $("out2").innerHTML=h;
+}
+
+/* ---------------- Q4 — verificação à ruptura ---------------- */
+function tabelaPadrao(){
+  const r = ACOS[$("a4").value].fptk/1900;
+  $("s10").value = Math.round(1499*r);
+  $("s15").value = Math.round(1525*r);
+  calcQ4();
+}
+function calcQ4(){
+  const bf=n("bf4"), hf=n("hf4"), bw=n("bw4"), H=n("h4"), cg=n("cg4");
+  const fck=n("fck4"), Asp=n("asp4"), epre=n("epre4"), aco=$("a4").value;
+  const Mg=n("mg4"), Mq1=n("mq14"), Mq2=n("mq24"), psi0=n("psi04");
+  const s10=n("s10"), s15=n("s15"), gg=n("gg4"), gq=n("gq4"), gc=n("gc4"), gs=n("gs4");
+  if([bf,hf,bw,H,cg,fck,Asp,epre,Mg,Mq1,Mq2,psi0,s10,s15,gg,gq,gc,gs].some(v=>!Number.isFinite(v)) || Asp<=0)
+    return vazio("out4","Preencha todos os campos numéricos para ver a resolução.");
+  const d=H-cg;
+  if(d<=0) return vazio("out4","O CG dos cabos precisa ficar abaixo do topo da seção.");
+
+  const C=conc(fck), fcd=fck/gc/10, sc=C.ac*C.ec*fcd;
+  const fpy=fpyk(aco), fpyd=fpy/gs, epyd=fpyd/E_P*1000, ecu=C.ecu, lam=C.lam;
+  const sigmaP = e => e<=epyd ? E_P*e/1000
+                   : e<=10   ? fpyd + (s10-fpyd)*(e-epyd)/(10-epyd)
+                             : s10 + (s15-s10)*(e-10)/5;
+  const Acc = y => y<=hf ? bf*y : bf*hf + bw*(y-hf);
+  const eq = x => { const y=lam*x, ead=ecu*(d-x)/x, et=epre+ead;
+                    return {y,Rcc:sc*Acc(y),ead,et,sp:sigmaP(et),Rst:sigmaP(et)/10*Asp}; };
+
+  const x1=d*ecu/(ecu+10), t1=eq(x1), st1=sigmaP(epre+10), Rst1=st1/10*Asp;
+  let lo=0.01*d, hi=0.999*d;
+  for(let i=0;i<200;i++){ const m=(lo+hi)/2; (eq(m).Rcc<eq(m).Rst)?lo=m:hi=m; }
+  const x=(lo+hi)/2, r=eq(x), z=d-r.y/2, Mu=r.Rst*z/100;
+  const Md=gg*Mg+gq*(Mq1+psi0*Mq2), razao=Mu/Md, xd=x/d;
+
+  let h="";
+  h+=passo(1,"Altura útil e parâmetros do concreto"+IT("8.2.10.1 / 17.2.2-e"),null,
+    `d = ${f(H,0)} − ${f(cg,0)} = ${f(d,0)} cm\n`+
+    `λ = ${f(lam,3)}   α_c = ${f(C.ac,3)}   η_c = ${f(C.ec,3)}   ε_cu = ${f(ecu)} ‰\n`+
+    `σ_c = α_c · η_c · f_cd = ${f(sc,4)} kN/cm²\n`+
+    `f_pyd = ${f(fpy,0)}/${f(gs,2)} = ${f(fpyd,1)} MPa   →   ε_pyd = ${f(epyd)} ‰`,
+    null,null,
+    `Se a largura diminuísse da linha neutra para a borda comprimida, o pico cairia para 0,9 α_c η_c f_cd.`);
+  h+=passo(2,`Primeira tentativa: ε<sub>c</sub> = ${f(ecu)} ‰ e ε<sub>sp</sub> = 10 ‰`+IT("Figura 17.1"),
+    "x/d = ε<sub>c</sub> / (ε<sub>c</sub> + ε<sub>sp</sub>)",
+    `x = ${f(d,0)} · ${f(ecu)}/${f(ecu+10)} = ${f(x1)} cm     y = λx = ${f(lam*x1)} cm\n`+
+    `A_cc = ${f(Acc(lam*x1),0)} cm²   →   R_cc = ${f(t1.Rcc,0)} kN\n`+
+    `ε_total = ${f(epre)} + 10 = ${f(epre+10)} ‰  →  σ_sp = ${f(st1,1)} MPa\n`+
+    `R_st = ${f(st1/10)} × ${f(Asp,0)} = ${f(Rst1,0)} kN`, null,null,
+    t1.Rcc<Rst1?`R_cc &lt; R_st: a linha neutra tem de descer. Ao aumentar x o aço se deforma menos, então σ_sp e R_st também caem.`
+               :`R_cc &gt; R_st: a linha neutra tem de subir. Ao reduzir x o aço se deforma mais e R_st aumenta.`);
+  const am=[0.65,0.85,1.15].map(k=>{const xx=Math.min(0.98*d,k*x);return {xx,...eq(xx)};});
+  h+=passo(3,"Iteração até R<sub>cc</sub> = R<sub>st</sub>",
+    `ε<sub>c</sub> fixo em ${f(ecu)} ‰ ; ε<sub>sp</sub> = ε<sub>c</sub>·(d − x)/x ; ε<sub>total</sub> = ε<sub>pré</sub> + ε<sub>sp</sub>`,
+    `<table class="iter"><tr><th>x (cm)</th><th>y (cm)</th><th>ε total (‰)</th><th>σ_sp (MPa)</th><th>R_cc (kN)</th><th>R_st (kN)</th></tr>`+
+    am.map(a=>`<tr><td>${f(a.xx,1)}</td><td>${f(a.y,1)}</td><td>${f(a.et)}</td><td>${f(a.sp,0)}</td><td>${f(a.Rcc,0)}</td><td>${f(a.Rst,0)}</td></tr>`).join("")+
+    `<tr class="eq"><td>${f(x,1)}</td><td>${f(r.y,1)}</td><td>${f(r.et)}</td><td>${f(r.sp,0)}</td><td>${f(r.Rcc,0)}</td><td>${f(r.Rst,0)}</td></tr></table>`,
+    `equilíbrio em x = ${f(x,1)} cm   →   R_cc = R_st = ${f(r.Rst,0)} kN`, null,
+    r.y<=hf?`y = ${f(r.y,1)} cm ≤ h_f: toda a compressão está na mesa.`
+           :`y = ${f(r.y,1)} cm &gt; h_f = ${f(hf,0)} cm: a compressão invade a alma — A_cc = ${f(Acc(r.y),0)} cm².`);
+  h+=passo(4,"Momento último","M<sub>u</sub> = R<sub>st</sub> · z ,  z = d − y/2",
+    `z = ${f(d,0)} − ${f(r.y,1)}/2 = ${f(z,1)} cm\nM_u = ${f(r.Rst,0)} × ${f(z/100,3)}`,
+    `M_u = ${f(Mu,0)} kN·m`);
+  h+=passo(5,"Momento solicitante de cálculo"+IT("Tabela 11.1"),
+    "M<sub>d</sub> = γ<sub>g</sub>·M<sub>g</sub> + γ<sub>q</sub>·(M<sub>q1</sub> + ψ<sub>0</sub>·M<sub>q2</sub>)",
+    `M_d = ${f(gg,2)} × ${f(Mg,0)} + ${f(gq,2)} × (${f(Mq1,0)} + ${f(psi0,2)} × ${f(Mq2,0)})`,
+    `M_d = ${f(Md,0)} kN·m`, null,
+    psi0===1?`Com ψ_0 = 1 as duas acidentais entram integrais — hipótese a favor da segurança quando o enunciado não fornece ψ_0 (os valores estão na ABNT NBR 8681).`:null);
+
+  const ok=razao>=1;
+  h+=`<div class="verif"><h3>Veredito</h3>`
+    + check(ok,"Segurança à ruptura",`M_u / M_d = ${f(Mu,0)} / ${f(Md,0)} = ${f(razao)}`,ok?"garantida":"NÃO garantida")
+    + check(r.et<=10,"Alongamento total do aço"+IT("Figura 17.1"),`ε_total = ${f(r.et)} ‰ (limite 10 ‰)`,r.et<=10?"o aço não rompe":"acima do limite")
+    + check(xd<=C.xd,"Dutilidade"+IT("14.6.4.3"),`x/d = ${f(xd,3)} (limite ${f(C.xd,2)})`,xd<=C.xd?"seção dútil":"seção pouco dútil")
+    + `</div>`;
+  h+=`<p class="obs" style="padding-top:8px">${ok
+      ? "A ruína se dá por esmagamento do concreto com o aço ainda íntegro."
+      : "Para atender ao ELU seria preciso aumentar a área de aço, a altura da seção ou o f_ck. A diferença a cobrir é de "+f(Md-Mu,0)+" kN·m."}</p>`;
+  $("out4").innerHTML=h;
+}
+
+/* ---------------- Q3 — tensões ---------------- */
+function modo3(){
+  const v=$("modo3").value;
+  $("bloco-min").hidden = v!=="min";
+  $("bloco-ver").hidden = v!=="ver";
+  $("sub3").innerHTML = v==="min" ? "6 passos + verificações" : "ato da protensão + tempo infinito";
+  calcQ3();
+}
+function calcQ3(){
+  const fck=n("fck3"), L=n("L3"), g=n("g3"), q=n("q3v");
+  const A=n("A3"), Ws=n("Ws3"), Wi=n("Wi3"), yc=n("yc3"), yp=n("yp3"), pd=n("pd3")/100;
+  const gp=n("gp3"), psi1=n("psi13"), psi2=n("psi23"), alpha=parseFloat($("alpha3").value);
+  const completa = $("tipo3").value==="completa";
+  if([fck,L,g,q,A,Ws,Wi,yc,yp,pd,gp,psi1,psi2].some(v=>!Number.isFinite(v)) || A<=0||Ws<=0||Wi<=0)
+    return vazio("out3","Preencha todos os campos numéricos (A, W<sub>s</sub> e W<sub>i</sub> maiores que zero).");
+
+  const C=conc(fck), fctm=C.fctm;
+  const fctf=0.7*alpha*fctm;              /* 17.2.4.4.2 — fissuração no ELS-F */
+  const tracAto=1.2*fctm;                 /* 17.2.4.3.2 */
+  const limRara=0.6*fck, limQP=0.45*fck;  /* 17.2.4.4.1 */
+  const Mg=g*L*L/8, Mq=q*L*L/8;
+  const sgs=+Mg/1000/Ws, sgi=-Mg/1000/Wi, sqs=+Mq/1000/Ws, sqi=-Mq/1000/Wi;
+  const e=yc-yp, ks=1/A-e/Ws, ki=1/A+e/Wi, eta=1-pd;
+  const Mrara=Mg+Mq, Mfreq=Mg+psi1*Mq, Mqp=Mg+psi2*Mq;
+
+  const p1 = passo(1,"Momentos característicos","M = q·L²/8",
+    `M_g = ${f(g,0)} × ${f(L,0)}² / 8 = ${f(Mg,0)} kN·m\nM_q = ${f(q,0)} × ${f(L,0)}² / 8 = ${f(Mq,0)} kN·m`);
+  const p2 = passo(2,"Limites de tensão"+IT("17.2.4.3.2 / 17.2.4.4"),null,
+    `f_ctm = 0,3 · ${f(fck,0)}^(2/3) = ${f(fctm)} MPa            α = ${f(alpha,1)}\n`+
+    `ato:        compressão ≤ 0,7 f_ckj    tração ≤ 1,2 f_ctm = ${f(tracAto)} MPa\n`+
+    `ELS-F:      fissura se a tração passar de 0,7·α·f_ctm = ${f(fctf)} MPa\n`+
+    `serviço:    ≤ 0,6 f_ck = ${f(limRara,1)} MPa (rara e frequente) ; ≤ 0,45 f_ck = ${f(limQP,2)} MPa (quase perm.)`,
+    null,null,`Na 2026 o limite do ELS-F passou a ser 0,7·α·f_ctm; o do ato continua 1,2·f_ctm.`);
+
+  if($("modo3").value==="min"){
+    const ta=n("ta3"), comb=$("comb3").value;
+    if(!Number.isFinite(ta)) return vazio("out3","Informe a tração admitida (0 para não permitir tração).");
+    $("dica3").innerHTML=`Protensão parcial: σ<sub>t,adm</sub> = 0,7·α·f<sub>ctm</sub> = ${f(0.7*1.2*fctm)} MPa (T) · ${f(0.7*1.3*fctm)} MPa (I) · ${f(0.7*1.5*fctm)} MPa (retangular).`;
+    const M = comb==="rara"?Mrara : comb==="freq"?Mfreq : Mqp;
+    const nomeC = comb==="rara"?"rara (g + q)" : comb==="freq"?`frequente (g + ${f(psi1,2)}·q)` : `quase permanente (g + ${f(psi2,2)}·q)`;
+    const siC=-M/1000/Wi, ssC=+M/1000/Ws;
+    const ksf=ks*eta, kif=ki*eta, N=(-siC-ta)/kif;
+
+    let h=p1+p2;
+    h+=passo(3,"Tensões das cargas",
+      "σ<sub>s</sub> = +M/W<sub>s</sub>   σ<sub>i</sub> = −M/W<sub>i</sub>",
+      `peso próprio :  σ_s = ${f(sgs)}   σ_i = ${f(sgi)} MPa\n`+
+      `carga móvel  :  σ_s = ${f(sqs)}   σ_i = ${f(sqi)} MPa\n`+
+      `combinação ${nomeC}: M = ${f(M,0)} kN·m  →  σ_s = ${f(ssC)}   σ_i = ${f(siC)} MPa`);
+    h+=passo(4,"Tensões de protensão, em função de N","σ = N/A ∓ N·e/W",
+      `e = ${f(yc,2)} − ${f(yp,2)} = ${f(e,3)} m\n`+
+      `σ_s = ${f(1/A,3)}·N − ${f(e/Ws,3)}·N = ${f(ks,3)}·N\n`+
+      `σ_i = ${f(1/A,3)}·N + ${f(e/Wi,3)}·N = ${f(ki,3)}·N`,null,null,"N em MN resulta em σ em MPa.");
+    h+=passo(5,"Aplicação das perdas","só as parcelas de protensão são multiplicadas por (1 − perdas)",
+      `η = ${f(eta,2)}\nσ_s = ${f(ksf,3)}·N        σ_i = ${f(kif,3)}·N`);
+    h+=passo(6,"Condição na fibra inferior","σ<sub>carga</sub> + σ<sub>protensão</sub> ≥ −σ<sub>t,adm</sub>",
+      `${f(siC)} + ${f(kif,3)}·N \u2265 ${f(ta===0?0:-ta)}\nN = ${f(-siC-ta)} / ${f(kif,3)}`,
+      `N = ${f(N,3)} MN = ${f(N*1000,0)} kN`,null,"Força inicial de protensão, antes das perdas.");
+
+    const atoS=0.9*sgs+gp*ks*N, atoI=0.9*sgi+gp*ki*N;
+    const rS=ssC*0+Mrara/1000/Ws+ksf*N, rI=-Mrara/1000/Wi+kif*N;
+    const qS=Mqp/1000/Ws+ksf*N, qI=-Mqp/1000/Wi+kif*N;
+    h+=`<div class="verif"><h3>Verificações pela NBR 6118:2026</h3>`
+      + check(atoS>=-tracAto,"Ato da protensão — tração no topo"+IT("17.2.4.3"),
+          `0,9·${f(sgs)} + ${f(gp,2)}·(${f(ks*N)}) = ${f(atoS)} MPa (limite ${f(-tracAto)})`,
+          atoS>=-tracAto?"dentro do limite":"ULTRAPASSA")
+      + check(Math.max(atoS,atoI)<=0.7*fck,"Ato da protensão — compressão"+IT("17.2.4.3.2"),
+          `fundo = 0,9·${f(sgi)} + ${f(gp,2)}·${f(ki*N)} = ${f(atoI)} MPa (limite 0,7 f_ckj = ${f(0.7*fck,1)})`,
+          Math.max(atoS,atoI)<=0.7*fck?"dentro do limite":"ULTRAPASSA")
+      + check(rI>=-fctf,"ELS-F na combinação rara"+IT("17.2.4.4.2"),
+          `fibra inferior = ${f(rI)} MPa (limite ${f(-fctf)})`, rI>=-fctf?"não fissura":"FISSURA")
+      + check(rS<=limRara,"Compressão na combinação rara"+IT("17.2.4.4.1"),
+          `topo = ${f(rS)} MPa (limite ${f(limRara,1)})`, rS<=limRara?"dentro do limite":"ULTRAPASSA")
+      + check(Math.max(qS,qI)<=limQP,"Compressão na quase permanente"+IT("17.2.4.4.1"),
+          `topo = ${f(qS)} · fundo = ${f(qI)} MPa (limite ${f(limQP,2)})`,
+          Math.max(qS,qI)<=limQP?"dentro do limite":"ULTRAPASSA")
+      + `</div>`;
+    h+=`<p class="obs" style="padding-top:8px">No ato, o peso próprio entra com γ_f = 0,9 por ser favorável, e a protensão com γ_p = ${f(gp,2)} (item 17.2.4.3.1).</p>`;
+    return void($("out3").innerHTML=h);
+  }
+
+  /* ---- modo verificação ---- */
+  const N0=n("N3"); let fckj=n("fckj3"); if(!Number.isFinite(fckj)||fckj<=0) fckj=fck;
+  if(!Number.isFinite(N0)) return vazio("out3","Informe a força de protensão no ato.");
+  const Ninf=N0/1000*eta, N0m=N0/1000;
+  const p0s=ks*N0m, p0i=ki*N0m, pis=ks*Ninf, pii=ki*Ninf;
+  const fctmj=fckj<=50?0.3*Math.pow(fckj,2/3):C.fctm;
+  const tracAtoJ=1.2*fctmj, compAto=0.7*fckj;
+  const atoS=0.9*sgs+gp*p0s, atoI=0.9*sgi+gp*p0i;
+  const Mf = completa?Mrara:Mfreq, Md_ = completa?Mfreq:Mqp;
+  const nomeF = completa?"rara":"frequente", nomeD = completa?"frequente":"quase permanente";
+  const fS=Mf/1000/Ws+pis, fI=-Mf/1000/Wi+pii;
+  const dI=-Md_/1000/Wi+pii;
+  const qS=Mqp/1000/Ws+pis, qI=-Mqp/1000/Wi+pii;
+
+  let h=p1+p2;
+  h+=passo(3,"Tensões do peso próprio e da protensão",null,
+    `σ_s(pp) = ${f(sgs)} MPa      σ_i(pp) = ${f(sgi)} MPa\n`+
+    `e = ${f(yc,2)} − ${f(yp,2)} = ${f(e,3)} m\n`+
+    `no ato (N = ${f(N0,0)} kN):        σ_s = ${f(p0s)}   σ_i = ${f(p0i)} MPa\n`+
+    `no tempo ∞ (N = ${f(Ninf*1000,1)} kN):  σ_s = ${f(pis)}   σ_i = ${f(pii)} MPa`,
+    null,null,`As perdas de ${f(pd*100,0)} % reduzem a força para ${f(eta*100,0)} % da inicial.`);
+  h+=passo(4,`Ato da protensão — γ<sub>p</sub> = ${f(gp,2)} e γ<sub>f</sub> = 0,9 no peso próprio`+IT("17.2.4.3.1"),
+    "só o peso próprio atua; ele é favorável nas duas fibras, então entra com 0,9",
+    `topo  : 0,9 · ${f(sgs)} + ${f(gp,2)} · (${f(p0s)}) = ${f(atoS)} MPa\n`+
+    `fundo : 0,9 · (${f(sgi)}) + ${f(gp,2)} · ${f(p0i)} = ${f(atoI)} MPa\n`+
+    `limites com f_ckj = ${f(fckj,0)} MPa:  tração ${f(-tracAtoJ)}  ·  compressão ${f(compAto,1)} MPa`);
+  h+=passo(5,`Tempo infinito — ELS-F na combinação ${nomeF}`+IT("Tabela 13.4"),
+    `protensão ${completa?"completa (Nível 3)":"limitada (Nível 2)"} → ELS-F na combinação ${nomeF}`,
+    `M = ${completa?`${f(Mg,0)} + ${f(Mq,0)}`:`${f(Mg,0)} + ${f(psi1,2)} × ${f(Mq,0)}`} = ${f(Mf,0)} kN·m\n`+
+    `topo  : ${f(Mf/1000/Ws)} + (${f(pis)}) = ${f(fS)} MPa\n`+
+    `fundo : ${f(-Mf/1000/Wi)} + ${f(pii)} = ${f(fI)} MPa`);
+
+  const okAtoT=atoS>=-tracAtoJ && atoI>=-tracAtoJ, okAtoC=Math.max(atoS,atoI)<=compAto;
+  const okF=fI>=-fctf, okC=fS<=limRara, okD=dI>=0, okQP=Math.max(qS,qI)<=limQP;
+  h+=`<div class="verif"><h3>Veredito</h3>`
+    + check(okAtoT,"Ato — tração"+IT("17.2.4.3.2"),`menor tensão = ${f(Math.min(atoS,atoI))} MPa (limite ${f(-tracAtoJ)})`,okAtoT?"dentro do limite":"ULTRAPASSADO")
+    + check(okAtoC,"Ato — compressão"+IT("17.2.4.3.2"),`maior tensão = ${f(Math.max(atoS,atoI))} MPa (limite ${f(compAto,1)})`,okAtoC?"dentro do limite":"ULTRAPASSADO")
+    + check(okF,`ELS-F na combinação ${nomeF}`+IT("17.2.4.4.2"),`fibra inferior = ${f(fI)} MPa (limite ${f(-fctf)})`,okF?"não fissura":"FISSURA")
+    + check(okC,`Compressão na ${nomeF}`+IT("17.2.4.4.1"),`fibra superior = ${f(fS)} MPa (limite ${f(limRara,1)})`,okC?"dentro do limite":"ULTRAPASSADO")
+    + check(okQP,"Compressão na quase permanente"+IT("17.2.4.4.1"),`topo = ${f(qS)} · fundo = ${f(qI)} MPa (limite ${f(limQP,2)})`,okQP?"dentro do limite":"ULTRAPASSADO")
+    + check(okD,`ELS-D na combinação ${nomeD}`+IT("Tabela 13.4"),`M = ${f(Md_,0)} kN·m → fibra inferior = ${f(dI)} MPa`,okD?"atendida":"não atendida")
+    + `</div>`;
+  h+=`<p class="obs" style="padding-top:8px">${
+      (okAtoT&&okAtoC)?"No ato da protensão os limites não foram ultrapassados.":"No ato da protensão algum limite foi ultrapassado."
+    } ${okF?"No tempo infinito a seção continua sem fissurar."
+          :"No tempo infinito o limite de tração foi ultrapassado: a seção passa a trabalhar no Estádio II. Seria preciso mais protensão ou maior excentricidade do cabo."}</p>`;
+  $("out3").innerHTML=h;
+}
+
+/* ---------------- Q1 ---------------- */
+function calcQ1(){
+  const aco=$("a1").value, sis=$("sis1").value, Ep=n("Ep1"), gs=n("gs1");
+  if(!Number.isFinite(Ep)||!Number.isFinite(gs)||Ep<=0||gs<=0)
+    return vazio("out1","Informe E<sub>p</sub> e γ<sub>s</sub> maiores que zero.");
+  const fpt=ACOS[aco].fptk, fpy=fpyk(aco), fpyd=fpy/gs, eps=fpyd/Ep*1000, sp=sigmaP0(aco,sis);
+  let h=passo(1,"Tensão de escoamento característica"+IT("ABNT NBR 7483"),
+    ACOS[aco].rel==="RB"?"f<sub>pyk</sub> = 0,90 · f<sub>ptk</sub> (relaxação baixa)"
+                        :"f<sub>pyk</sub> = 0,85 · f<sub>ptk</sub> (relaxação normal)",
+    `f_ptk = ${f(fpt,0)} MPa\nf_pyk = ${ACOS[aco].rel==="RB"?"0,90":"0,85"} × ${f(fpt,0)}`,
+    `f_pyk = ${f(fpy,0)} MPa`);
+  h+=passo(2,"Tensão de escoamento de cálculo"+IT("Tabela 12.1"),"f<sub>pyd</sub> = f<sub>pyk</sub> / γ<sub>s</sub>",
+    `f_pyd = ${f(fpy,0)} / ${f(gs,2)}`, `f_pyd = ${f(fpyd,1)} MPa`);
+  h+=passo(3,"Deformação de cálculo ao escoamento"+IT("8.4.4"),"ε<sub>pyd</sub> = f<sub>pyd</sub> / E<sub>p</sub>",
+    `ε_pyd = ${f(fpyd,1)} / ${f(Ep,0)}`, `ε_pyd = ${f(eps)} ‰`);
+  h+=passo(4,`Tensão inicial no cabo — ${sp.nome}`+IT(sp.item),
+    "σ<sub>p0</sub> = c · f<sub>ptk</sub>",
+    `pré-tração              : 0,77 × ${f(fpt,0)} = ${f(0.77*fpt,1)} MPa = ${f(0.077*fpt)} kN/cm²\n`+
+    `pós-tração aderente     : 0,74 × ${f(fpt,0)} = ${f(0.74*fpt,1)} MPa = ${f(0.074*fpt)} kN/cm²\n`+
+    `pós-tração não aderente : 0,80 × ${f(fpt,0)} = ${f(0.80*fpt,1)} MPa = ${f(0.080*fpt)} kN/cm²`,
+    `σ_p0 = ${f(sp.valor,1)} MPa = ${f(sp.valor/10)} kN/cm²`, null,
+    `A edição de 2026 eliminou o limite por f_pyk (0,82 f_pyk na pós-tração), que era o que governava nas provas antigas.`);
+  $("out1").innerHTML=h;
+}
+
+/* ---------------- abas ---------------- */
+const LEGENDAS = {
+  q2:"<b>Quantos cabos a seção precisa.</b> A armadura ainda não existe. Dimensionamento no ELU admitindo a linha neutra dentro da mesa — como a Questão 2 da VC 2024.",
+  q4:"<b>A seção armada aguenta?</b> A armadura já existe e você compara M<sub>u</sub> com M<sub>d</sub>. A iteração até R<sub>cc</sub> = R<sub>st</sub> é feita aqui — como a Questão 2 da VC 2023.",
+  q3:"<b>Tensões elásticas na seção.</b> Ou você acha a força mínima de protensão (VC 2024), ou verifica se os limites foram ultrapassados com N conhecido (VC 2023). Escolha no primeiro campo.",
+  q1:"<b>Propriedades do aço.</b> Deformação de escoamento e os três limites de tensão inicial no cabo da NBR 6118:2026.",
+  q5:"<b>Consulta rápida.</b> Constantes, limites, combinações e o que mudou da edição anterior, com o item da norma ao lado."
+};
+document.querySelectorAll('nav button').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('nav button').forEach(o=>{
+      const id=o.getAttribute('aria-controls'), ativo=o===b;
+      o.setAttribute('aria-selected',ativo);
+      $(id).hidden=!ativo;
+      if(ativo) $("legenda").innerHTML=LEGENDAS[id];
+    });
+  });
+});
+$("legenda").innerHTML=LEGENDAS.q2;
+modo3(); calcQ1(); calcQ2(); calcQ4();
+</script>
+</body>
+</html>
